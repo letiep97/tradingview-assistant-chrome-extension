@@ -6,15 +6,48 @@
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  // chrome.storage.local.get('tabId', (getResults) => {
+  chrome.storage.local.get('iondvLang', (res) => {
+    if (res && res.iondvLang) iondvSetLang(res.iondvLang)
+    applyI18n()
+    updateLangToggleButton()
+  })
   checkIsTVChart()
   setPopupInputsByOptions()
-
   setClickEvents()
-
   setOptionsEvents()
+  setLangToggleEvent()
 });
 
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n')
+    const str = t(key)
+    if (str && str !== key) el.textContent = str
+  })
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html')
+    const str = t(key)
+    if (str && str !== key) el.innerHTML = str
+  })
+}
+
+function updateLangToggleButton() {
+  const btn = document.getElementById('langToggle')
+  if (btn) btn.textContent = t('langToggleLabel')
+}
+
+function setLangToggleEvent() {
+  const btn = document.getElementById('langToggle')
+  if (!btn) return
+  btn.addEventListener('click', () => {
+    const newLang = IONDV_LANG === 'vi' ? 'en' : 'vi'
+    iondvSetLang(newLang)
+    chrome.storage.local.set({'iondvLang': newLang})
+    applyI18n()
+    updateLangToggleButton()
+  })
+}
 
 function setOptionsEvents() {
   for(let elId of ['optMinmax', 'optParamName', 'optMethod', 'optFilterOff', 'optFilterMore', 'optFilterLess',
@@ -52,9 +85,9 @@ function checkIsTVChart() {
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     let message = null
     if(!tabs[0].url.includes('tradingview.com'))
-      message = 'To work with the extension, activate it on the tab with the opened <a href="https://www.tradingview.com/chart" target="_blank">Tradingview chart</a>.'
+      message = t('warningNeedTV')
     if(!tabs[0].url.includes('www.tradingview.com') && !tabs[0].url.includes('en.tradingview.com'))
-      message = 'The extension works with the <a href="https://www.tradingview.com/chart" target="_blank">English version</a> of Tradingview.'
+      message = t('warningEnVersion')
     if (message) {
       for(let elId of ['warningSignals', 'warningBacktest']) {
         if (document.getElementById(elId))
@@ -195,7 +228,7 @@ function sendSignalToActiveTab(signal) {
 
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     if(!tabs[0].url.includes('tradingview.com')) {
-      document.getElementById('msg-text').innerHTML = 'To work with the extension, activate it on the tab with the opened <a href="https://www.tradingview.com/chart" target="_blank">Tradingview chart</a>.'
+      document.getElementById('msg-text').innerHTML = t('warningNeedTV')
       document.getElementById('shim').style.display = 'block'
       document.getElementById('msgbx').style.display = 'block'
       return

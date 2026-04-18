@@ -14,7 +14,8 @@
     "content_scripts": [
         {
             "matches": ["https://*.tradingview.com/chart/*"],
-            "js": [  "content_scripts/selector.js",
+            "js": [  "i18n/strings.js", "i18n/i18n.js",
+              "content_scripts/selector.js",
               "content_scripts/page.js", "content_scripts/ui.js", "content_scripts/tv.js", "content_scripts/tvChart.js",
               "content_scripts/file.js", "content_scripts/storage.js", "content_scripts/signal.js",
               "content_scripts/model.js","content_scripts/backtest.js",

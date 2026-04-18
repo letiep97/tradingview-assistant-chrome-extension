@@ -6,27 +6,29 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <script src="../i18n/strings.js"></script>
+        <script src="../i18n/i18n.js"></script>
         <script src="assistant.js"></script>
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
 <body>
 <div class="wrapper">
     <div class="content">
-        <div class="popup_header">
-            <h2>Tradingview assistant</h2>
+        <div class="popup_header" style="display:flex;align-items:center;justify-content:space-between;">
+            <h2 data-i18n="appTitle">Tradingview assistant</h2>
+            <button id="langToggle" style="font-size:11px;padding:2px 7px;cursor:pointer;border:1px solid #ccc;border-radius:3px;background:#f5f5f5;">EN</button>
         </div>
 
 
         <div class="tabs">
             <div id="content-1">
                 <div id="warningBacktest" class="subheader">
-                    <p>The extension works with the <a href="https://www.tradingview.com/chart" target="_blank">English
-                        version</a> of Tradingview</p>
+                    <p id="warningBacktestMsg" data-i18n-html="warningEnVersion">The extension works with the <a href="https://www.tradingview.com/chart" target="_blank">English version</a> of Tradingview</p>
                 </div>
                 <div class="row">
                     <div class="details">
                         <details open>
-                            <summary>Strategy optimization parameters</summary>
+                            <summary data-i18n="stratOptParamsTitle">Strategy optimization parameters</summary>
                             <div>
                                 <div class="param-container">
                                     <div class="param-box">
@@ -35,7 +37,7 @@
                                                 <input id="optMinmax" type="checkbox" checked>
                                                 <b></b>
                                             </label>
-                                            <span> value of</span>
+                                            <span data-i18n="labelValueOf"> value of</span>
                                         </div>
                                         <div>
                                             <select id="optParamName" name="optParamName">
@@ -247,7 +249,7 @@
 
                                             </select>
                                         </div>
-                                        <div>by</div>
+                                        <div data-i18n="labelBy">by</div>
                                         <div>
                                             <select id="optMethod" name="method">
                                                 <option value="annealing">Annealing</option>
@@ -257,29 +259,29 @@
                                                 <option value="brute force">Brute force</option>
                                             </select>
                                         </div>
-                                        <div>method</div>
+                                        <div data-i18n="labelMethod">method</div>
                                     </div>
                                 </div>
                             </div>
                             <div>
                                 <div class="param-container">
-                                    <span>Filter to use the best results corresponding to the parameters:</span>
+                                    <span data-i18n="labelFilterDesc">Filter to use the best results corresponding to the parameters:</span>
                                     <div class="param-box">
 
                                         <div class="switch-toggle switch-3 switch-candy">
                                             <input id="optFilterOff" name="state-d" type="radio" checked="checked"/>
-                                            <label for="optFilterOff">OFF</label>
+                                            <label for="optFilterOff" data-i18n="filterOff">OFF</label>
 
                                             <input id="optFilterMore" name="state-d" type="radio"/>
-                                            <label for="optFilterMore" class="disabled">More</label>
+                                            <label for="optFilterMore" class="disabled" data-i18n="filterMore">More</label>
 
                                             <input id="optFilterLess" name="state-d" type="radio"/>
-                                            <label for="optFilterLess">Less</label>
+                                            <label for="optFilterLess" data-i18n="filterLess">Less</label>
                                             <div id="filterParam">
-                                                <span>than</span>
+                                                <span data-i18n="filterThan">than</span>
                                                 <input id="optFilterValue" type="number" name="method"
                                                        style="width: 5em" value="5">
-                                                <span>for</span>
+                                                <span data-i18n="filterFor">for</span>
                                                 <select id="optFilterParamName" name="optFilterParamName">
                                                     <option value="Equity Metrics tab" disabled="disabled">Equity Metrics</option>
 
@@ -498,8 +500,7 @@
                                     <div class="param-box">
                                         <div>
                                             <input id="shouldTestTF" type="checkbox"/>
-                                            <label for="shouldTestTF">Backtesting the strategy on timeframes (divided by
-                                                comma)</label>
+                                            <label for="shouldTestTF" data-i18n="labelTestTF">Backtesting the strategy on timeframes (divided by comma)</label>
                                         </div>
                                         <div><input id="listOfTF" type="text" placeholder="1m,2h,1D,2W,1M"
                                                     title="Set list of timeframes, where symbol format is: 1m - minutes, 2h - hours, 3D - days, 4W - weeks, 5M - month "
@@ -507,7 +508,7 @@
                                             <label for="listOfTF" class="disabled"></label></div>
 
                                     </div>
-                                    <span style="font-size: 80%">the recommendation is to use around or less 100-200 cycles per test</span>
+                                    <span style="font-size: 80%" data-i18n="labelTFRecommend">the recommendation is to use around or less 100-200 cycles per test</span>
                                 </div>
                             </div>
                         </details>
@@ -515,17 +516,17 @@
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>If the range of test parameters is loaded or for automatic testing.</p>
+                        <p data-i18n="descTestStrategy">If the range of test parameters is loaded or for automatic testing.</p>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="testStrategy" class="button button-green">Test strategy</button>
+                            <button id="testStrategy" class="button button-green" data-i18n="btnTestStrategy">Test strategy</button>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>Deep backtesting (for TV premium subscription) now working as standart backtesting. Activate it manyally.</p>
+                        <p data-i18n="descDeepTest">Deep backtesting (for TV premium subscription) now working as standard backtesting. Activate it manually.</p>
 <!--                        <p><label for="deepStartDate">The start date</label>-->
 <!--                            <input id="deepStartDate" type="text" name="deepStartDate"-->
 <!--                                   pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"-->
@@ -541,28 +542,26 @@
 
                 <div class="row">
                     <div class="column left">
-                        <p>Getting a template for setting the testing parameters of the current strategy.</p>
+                        <p data-i18n="descGetTemplate">Getting a template for setting the testing parameters of the current strategy.</p>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="getStrategyTemplate" class="button button-blue">Get template</button>
+                            <button id="getStrategyTemplate" class="button button-blue" data-i18n="btnGetTemplate">Get template</button>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>To test the profit of strategies, upload a CSV file in which the lines correspond to the
-                            strategy parameters and contain the testing range.
-                            <a href="data:text/csv;charset=utf-8,Parameter,From,To,Step,Default,Priority
+                        <p data-i18n="descUploadParams">To test the profit of strategies, upload a CSV file in which the lines correspond to the strategy parameters and contain the testing range.</p>
+                        <p><a href="data:text/csv;charset=utf-8,Parameter,From,To,Step,Default,Priority
 SMALong,40,70,5,20,1
 EMAShort,5,15,1,21,2
 %22Check MACD%22,false,tre,,false,3
-%22Stop Loss%22,1,5,0.51,4%0A" download="strategy_template.csv">Sample template </a></p>
+%22Stop Loss%22,1,5,0.51,4%0A" download="strategy_template.csv" data-i18n="linkSampleTemplate">Sample template</a></p>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="uploadStrategyTestParameters" class="button button-blue">Upload parameters
-                            </button>
+                            <button id="uploadStrategyTestParameters" class="button button-blue" data-i18n="btnUploadParams">Upload parameters</button>
                         </div>
                     </div>
                 </div>
@@ -570,50 +569,46 @@ EMAShort,5,15,1,21,2
 
             <div id="content-2">
                 <div id="warningResults" class="subheader">
-                    <p>The extension works with the <a href="https://www.tradingview.com/chart" target="_blank">English
-                        version</a> of Tradingview</p>
+                    <p id="warningResultsMsg" data-i18n-html="warningEnVersion">The extension works with the <a href="https://www.tradingview.com/chart" target="_blank">English version</a> of Tradingview</p>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>Quick overview of the results of the last testing for this ticker and timeframe.</p>
+                        <p data-i18n="descPreviewResults">Quick overview of the results of the last testing for this ticker and timeframe.</p>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="previewStrategyTestResults" class="button button-blue">Preview results
-                            </button>
+                            <button id="previewStrategyTestResults" class="button button-blue" data-i18n="btnPreviewResults">Preview results</button>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>To download the results of the last testing for this ticker and timeframe.</p>
+                        <p data-i18n="descDownloadResults">To download the results of the last testing for this ticker and timeframe.</p>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="downloadStrategyTestResults" class="button button-blue">Download results
-                            </button>
+                            <button id="downloadStrategyTestResults" class="button button-blue" data-i18n="btnDownloadResults">Download results</button>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>View 3D char with the results</p>
+                        <p data-i18n="descShow3D">View 3D chart with the results</p>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="show3DChart" class="button button-blue">3D Chart</button>
+                            <button id="show3DChart" class="button button-blue" data-i18n="btn3DChart">3D Chart</button>
                         </div>
                     </div>
                 </div>
             </div>
             <div id="content-3">
                 <div id="warningSignals" class="subheader">
-                    <p>The extension works with the <a href="https://www.tradingview.com/chart" target="_blank">English
-                        version</a> of Tradingview</p>
+                    <p id="warningSignalsMsg" data-i18n-html="warningEnVersion">The extension works with the <a href="https://www.tradingview.com/chart" target="_blank">English version</a> of Tradingview</p>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        To display the signals, you need to create a pine script named 'iondvSignals' from the
+                        <span data-i18n="descSignals">To display the signals, you need to create a pine script named 'iondvSignals' from the</span>
                         <a href="data:text/plain;charset=utf-8,//©akumidv
 //@version=4
 study(%22iondv Signals%22,shorttitle=%22iondvSignals%22,overlay=true)
@@ -625,18 +620,15 @@ var arrTSBuy=str.split(strTSBuy,%22,%22)
 var arrTSSell=str.split(strTSSell,%22,%22)
 plotchar(tickerName==syminfo.ticker and array.includes(arrTSBuy,tostring(time))?low:na,location=location.belowbar,color=color.green,char='▲',title='Buy')
 plotchar(tickerName==syminfo.ticker and array.includes(arrTSSell,tostring(time))?high:na,location=location.abovebar,color=color.red,char='▼',title='Sell')%0A"
-                           download="iondv_signals_pinescript.txt">
-                            file</a> and add it to the graph.
-                        After that, upload the signals from the file created by the
+                           download="iondv_signals_pinescript.txt" data-i18n="descSignalsFile">file</a>
+                        <span data-i18n="descSignalsAdd">and add it to the graph. After that, upload the signals from the file created by the</span>
                         <a href="data:text/csv;charset=utf-8,timestamp,ticker,timeframe,signal
 1625718600000,BTCUSDT,1m,BUY
-2021-07-27T01:00:00Z,BABA,1H,SELL%0A" download="signals_template.csv">template</a>.
-                        The signals are stored in the browser, to activate them, open the properties of the created
-                        indicator named 'iondvSignals'.
+2021-07-27T01:00:00Z,BABA,1H,SELL%0A" download="signals_template.csv" data-i18n="descSignalsTemplate">template</a><span data-i18n="descSignalsStore">. The signals are stored in the browser, to activate them, open the properties of the created indicator named 'iondvSignals'.</span>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="uploadSignals" class="button button-ocean">Upload signals</button>
+                            <button id="uploadSignals" class="button button-ocean" data-i18n="btnUploadSignals">Upload signals</button>
                         </div>
                     </div>
                 </div>
@@ -646,32 +638,29 @@ plotchar(tickerName==syminfo.ticker and array.includes(arrTSSell,tostring(time))
                 <div class="header"></div>
                 <div class="row">
                     <div class="column left">
-                        <p>Delay between backtests to reduce TV API loading and reduce the risk of suspicious
-                            activity.</p>
-                        <p><label>Random delay for the specified value</label>
+                        <p data-i18n="descDelay">Delay between backtests to reduce TV API loading and reduce the risk of suspicious activity.</p>
+                        <p><label data-i18n="labelRandomDelay">Random delay for the specified value</label>
                             <input id="randomDelay" type="checkbox" checked/></p>
                     </div>
                     <div class="column right">
                         <input id="backtestDelay" type="number"
                                placeholder="1.5" value="1.75" style="width: 5em"/>
-                        <label for="backtestDelay">sec.</label>
+                        <label for="backtestDelay" data-i18n="labelSec">sec.</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>The maximum waiting time for data of the strategy, if the results table has not been updated
-                            (2 times more if used for deep backtesting). Reduce to speed up on simple strategies,
-                            increase if there is often a data extraction error..</p>
+                        <p data-i18n="descLoadingTime">The maximum waiting time for data of the strategy, if the results table has not been updated (2 times more if used for deep backtesting). Reduce to speed up on simple strategies, increase if there is often a data extraction error.</p>
                     </div>
                     <div class="column right">
                         <input id="dataLoadingTime" type="number"
                                placeholder="45" value="45" style="width: 5em"/>
-                        <label for="dataLoadingTime">sec.</label>
+                        <label for="dataLoadingTime" data-i18n="labelSec">sec.</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>Should skip init best parameters from previous backtest.</p>
+                        <p data-i18n="descSkipInit">Should skip init best parameters from previous backtest.</p>
                         <p></p>
                     </div>
                     <div class="column right">
@@ -681,7 +670,7 @@ plotchar(tickerName==syminfo.ticker and array.includes(arrTSSell,tostring(time))
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>Download results without waiting for click on ok button.</p>
+                        <p data-i18n="descSkipDownload">Download results without waiting for click on ok button.</p>
                         <p></p>
                     </div>
                     <div class="column right">
@@ -691,11 +680,11 @@ plotchar(tickerName==syminfo.ticker and array.includes(arrTSSell,tostring(time))
                 </div>
                 <div class="row">
                     <div class="column left">
-                        <p>Clear all stored data</p>
+                        <p data-i18n="descClearAll">Clear all stored data</p>
                     </div>
                     <div class="column right">
                         <div style="align-content: center">
-                            <button id="clearAll" class="button button-red">Clear all</button>
+                            <button id="clearAll" class="button button-red" data-i18n="btnClearAll">Clear all</button>
                         </div>
                     </div>
                 </div>
@@ -705,49 +694,21 @@ plotchar(tickerName==syminfo.ticker and array.includes(arrTSSell,tostring(time))
 
             <div id="content-5">
                 <div class="row">
-                    <h3>Optimization Methods</h3>
-                    <p style="padding: 2px;">The <strong>sequential improvements</strong> optimization method is
-                        implement adjusting the best value already found. It does not perform a complete search of
-                        the entire parameter space.
-                        The logic of it work is as follows. The current best state (parameters for max results) is
-                        taken. The first parameter is taken and all its values in the range are checked
-                        sequentially. If the best result is found, then further verification is carried out from
-                        this state. Then the next parameter is taken and all its values in the range are checked and
-                        etc.</p>
-                    <p style="padding: 2px;">The <strong>brute force</strong> optimization method implement
-                        backtesting all values in strategy space of parameters.</p>
-                    <p style="padding: 2px;">The <strong>annealing</strong> method is an optimization method in
-                        which the search for the maximum possible result is carried out in <a
-                                href="https://en.wikipedia.org/wiki/Simulated_annealing" target="_blank">fewer
-                            steps</a>
-                        The method works this way: first, the best state and its parameters are determined. One
-                        parameter is randomly determined, then its value from range of possible values is randomly
-                        selected. The status in this value is checked. If it is better, then it is remembered and
-                        further parameter changes are made from it.
-                        As the number of tests increases, the spread of parameter values decreases around those
-                        already found. That is, if at the beginning of testing the values are randomly selected from
-                        the entire range of possible parameter values, then as optimization is carried out, this
-                        spread decreases ("cools down") near current values. So in first phase of test - this method
-                        is search the most possible state around all space on the finish stage this method trying to
-                        improve found best state.
-                        So that the system does not get stuck in one parameter area, as it happens with the
-                        sequential method, not one random parameter changes periodically, but all at once.
-                        .</p>
-                    <p style="padding: 2px;">The <strong>random improvements</strong> method is the simplest. One
-                        parameter is randomly determined and then a value is randomly selected for it from the
-                        entire range of possible values. If the condition is better, then it is remembered. And then
-                        the parameters from this state are randomly changed.</p>
-                    <p style="padding: 2px;">The <strong>random</strong> method - always selects random values for
-                        all parameters at once (default)</p>
+                    <h3 data-i18n="helpOptMethodsTitle">Optimization Methods</h3>
+                    <p style="padding: 2px;" data-i18n-html="helpSequential">The <strong>sequential improvements</strong> optimization method implements adjusting the best value already found.</p>
+                    <p style="padding: 2px;" data-i18n-html="helpBruteForce">The <strong>brute force</strong> optimization method implements backtesting all values in strategy space of parameters.</p>
+                    <p style="padding: 2px;" data-i18n-html="helpAnnealing">The <strong>annealing</strong> method is an optimization method in which the search for the maximum possible result is carried out in fewer steps.</p>
+                    <p style="padding: 2px;" data-i18n-html="helpRandomImprov">The <strong>random improvements</strong> method is the simplest.</p>
+                    <p style="padding: 2px;" data-i18n-html="helpRandom">The <strong>random</strong> method - always selects random values for all parameters at once (default).</p>
 
                 </div>
             </div>
             <div class="tabs__links">
-                <a href="#content-1">Testing a strategy</a>
-                <a href="#content-2">Results</a>
-                <a href="#content-3">External signals</a>
-                <a href="#content-4">Options & Tools</a>
-                <a href="#content-5">Help</a>
+                <a href="#content-1" data-i18n="tabTesting">Testing a strategy</a>
+                <a href="#content-2" data-i18n="tabResults">Results</a>
+                <a href="#content-3" data-i18n="tabSignals">External signals</a>
+                <a href="#content-4" data-i18n="tabOptions">Options & Tools</a>
+                <a href="#content-5" data-i18n="tabHelp">Help</a>
             </div>
         </div>
 
@@ -755,20 +716,16 @@ plotchar(tickerName==syminfo.ticker and array.includes(arrTSSell,tostring(time))
         <div id="shim"></div>
         <div id="msgbx">
             <div class="msg-header">
-                <h5>Warning.</h5>
+                <h5 data-i18n="msgBoxTitle">Warning.</h5>
             </div>
             <p id="msg-text"></p>
             <div style="text-align: center">
-                <button id="closeMsg" class="button">Close</button>
+                <button id="closeMsg" class="button" data-i18n="btnClose">Close</button>
             </div>
         </div>
     </div>
     <div class="footer">
-        <p class="footer footer-text">Active use of the extension can cause detection by the TradingView as using a
-            bot
-            for backtesting and lead to the ban of the user's account. Use it on your own risk.
-            Additional <a href="https://github.com/akumidv/tradingview-assistant-chrome-extension" target="_blank">info
-                and contact to developer</a></p>
+        <p class="footer footer-text" data-i18n-html="footerWarning">Active use of the extension can cause detection by the TradingView as using a bot for backtesting and lead to the ban of the user's account. Use it on your own risk. Additional <a href="https://github.com/akumidv/tradingview-assistant-chrome-extension" target="_blank">info and contact to developer</a></p>
     </div>
 </div>
 </body>

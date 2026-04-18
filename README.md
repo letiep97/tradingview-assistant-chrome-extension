@@ -1,206 +1,113 @@
-# About
-An assistant for backtesting trading strategies and checking (showing) external signals in Tradingview implemented as a 
-Chrome browser extension.
+# Tradingview Assistant
 
-Add to Chrome from [webstore](https://chrome.google.com/webstore/detail/tradingview-assistant/pfbdfjaonemppanfnlmliafffahlohfg)
+> 🇬🇧 [English version](README.en.md)
 
-[Watch the youtube video](https://youtu.be/xhnlSCIlEkw)
+Tiện ích mở rộng Chrome hỗ trợ **backtest chiến lược giao dịch** và kiểm tra (hiển thị) tín hiệu bên ngoài trên Tradingview.
 
-Video [how to install extension](https://www.youtube.com/watch?v=FH7dI4K8w5k)
+Cài đặt từ [Chrome Web Store](https://chrome.google.com/webstore/detail/tradingview-assistant/pfbdfjaonemppanfnlmliafffahlohfg)
 
-## Disclaimer
-**Attention!** 
+[Xem video hướng dẫn trên YouTube](https://youtu.be/xhnlSCIlEkw)
 
-Active use of the extension can cause detection by the TradingView as using a bot for backtesting and lead to the ban 
-of the user's account.
+Video [cách cài đặt tiện ích](https://www.youtube.com/watch?v=FH7dI4K8w5k)
 
-Although the extension is not a bot (i.e. it does not work independently of the user in the cloud). The main idea of 
-this extension to help Tradingview community to have tools and functionality that not provided by Tradingview itself. 
-So as extension developing have no intention to break Tradingview rules, in result it does not 
-call the TradingView API, does not interfere with data transmission, and doesn't (and won't) parse/save/send any marker 
-(charts/news) data and other financial information, but only automates user behavior through the UI and provide some
-additional information. 
+## Cảnh báo
+**Chú ý!**
 
-But still usage of extensions and all risks remain with the users.
+Sử dụng tiện ích nhiều có thể bị TradingView phát hiện là dùng bot để backtesting và dẫn đến **khóa tài khoản**.
 
-The Tradingview support mention this rule for banned users
+Tiện ích không phải bot (không hoạt động độc lập trên cloud). Mục tiêu là hỗ trợ cộng đồng Tradingview có thêm công cụ mà TV chưa cung cấp. Tiện ích không gọi TV API, không can thiệp truyền dữ liệu, không lưu/gửi dữ liệu tài chính — chỉ tự động hóa thao tác UI.
 
-> TradingView is dedicated to providing users with a secure and accessible platform for the display of market data, 
-> charts, news, and other financial information. As such, users are strictly prohibited from employing any automated 
-> data collection methods, including but not limited to scripts, APIs, screen scraping, data mining, robots, or other 
-> data gathering and extraction tools, regardless of their intended purposes. The use of any technology to circumvent 
-> protective mechanisms designed to prevent unauthorized reproduction or distribution of TradingView content is 
-> expressly forbidden."
+Mọi rủi ro thuộc về người dùng.
 
-They have an obligation to their data providers and won't risk violating this agreement and of course won't 
-provide services at a loss.
+> TradingView nghiêm cấm mọi phương pháp thu thập dữ liệu tự động bao gồm scripts, APIs, screen scraping, robots, v.v.
 
-Most cases of banned users are due to the use of extensions for a long time on a few browsers/tabs with a single account and IP.
+Hầu hết trường hợp bị khóa là do dùng tiện ích liên tục trên nhiều tab/trình duyệt với cùng một tài khoản và IP.
 
-It is important to note that any changes to strategy parameters require a request to the Tradingview servers, and this
-costs money. 
+**Miễn trách nhiệm:** Nhà phát triển không chịu trách nhiệm về hậu quả phát sinh khi sử dụng tiện ích.
 
-To estimate how much your backtesting optimization cost for Tradingview you can use as basis of price
-for 1 second of backtesting as $0.0001 (AWS Lambda cost fo 5GB-sec). So 10 seconds strategy backtesting calculation with 
-1000 by changing parameters requests will demand servers for $1. If you are doing this everyday - it will cost $20 a month. 
-Of course if you are using free account, Essential($12 a month) or Plus ($24 a month) - you will generate lost for 
-Tradingview and they won't like this. If you backtest all night for 10,000 requests every day, then you high-load 
-Tradingview servers for $300 a month or more.
+## Khuyến nghị
 
-In that case if you have real good strategy it may be good idea to convert it to Python and test it
-on your own servers (and it will be in 10-100 times faster)
+Nguyên tắc chung: chiến lược càng nhiều tham số và được chọn càng chính xác thì càng bị overfit vào điều kiện thị trường cụ thể — lúc đó nó không còn là chiến lược giao dịch nữa mà trở thành bộ lọc.
 
-If your trading strategy is not good, the brute force for millions of combinations will not help. 
+**Khuyến nghị chính:** Tập trung vào 2-3 tham số quan trọng nhất (có tương quan với lợi nhuận). Thay vì tìm tham số tốt nhất tuyệt đối, hãy tìm tham số cho kết quả chấp nhận được trên nhiều điều kiện thị trường khác nhau.
 
-So be carefully and use extension wisely. 
+Nếu chiến lược tạo ra lợi nhuận vượt trội so với buy-and-hold (alpha) trên nhiều công cụ, khung thời gian, và giai đoạn khác nhau — đó có thể là chiến lược tốt. Nếu lợi nhuận gấp hơn 2 lần alpha, hãy tìm hiểu nguyên nhân: thường là do rủi ro cao hơn (beta) hoặc overfit lịch sử.
 
-**Disclaimer** 
-
-The developer of the extension does not response for any possible consequences of its use.
-
-## Recommendations
-
-Keep in mind the general rule: the more parameters a trading strategy has and the more precisely they are selected, the 
-better the strategy will be tuned to a specific market situation. In this case, it's not really a trading strategy 
-anymore, but rather a filter.
-
-The key recommendation is to focus on the 2-3 most significant parameters that have the most impact on result. These 
-are the parameters that are important for optimizing your strategy (correlated with profit). Instead of looking for 
-the absolute best parameters, look for those that produce an acceptable result across a wide range of market conditions 
-(for example, parameters that work well for multiple instruments and timeframes).
-
-If the strategy generates more revenue than the buy-and-hold strategy on the broad market (S&P for example, alfa), on 
-different instruments and timeframes, during different periods of deep testing, then it is possible that this strategy 
-could be a good one. However, if the strategy generates more than twice the alfa income, it would be wise to understand 
-why this is the case. Most often, this is due to the higher risk (beta) associated with the strategy, as well as the 
-historical fit, meaning that it may not work as well in the future.
-
-## Last version changes
+## Thay đổi phiên bản mới nhất
 2.10.x > 2.11.x:
-- fox for splitting of Performance summary to three tabs.
+- Sửa lỗi tách Performance summary thành ba tab.
 
-## Functionality
+## Tính năng
 
-### Backtesting trading strategies, optimisation of the strategy's parameters:
+### Backtest chiến lược giao dịch, tối ưu hóa tham số:
 
 ![](docs/Screenshot1.png)
 
-* automatic getting a list of parameters and their types (numeric, lists and checkboxes are supported)
-* generation of the testing range according to the rule: the beginning value is 2 times less than the current one, the end is 2 times more than the current one.
-* saving the generated parameters of testing a trading strategy for their correction as a template in a file in CSV format
-* Loading adjusted parameter ranges from a CSV file
-* Configuring the optimisation model:
-    * Choosing the type of optimisation: searching for the maximum or minimum values
-    * Selecting an optimised value from the entire list of strategy results in Tradingview (Net Profit, Ratio Avg Win / Avg Loss, Sharpe Ratio, Sortino Ratio, etc.)
-    * Choosing a search strategy in the parameter space(random, sequential, annealing method)
-* Filtering of unsuitable results. For example, the number of tradings is less than necessary
-* Setting the number of cycles to search for parameters.
-* Performing automatic selection of parameters with storing all the results in the browser storage and the ability to save them as CSV files after testing, including in case of an error or page reloading
-* Showing backtesting results on 3d chartto analyze the effect of various parameters on the result.
+* Tự động lấy danh sách tham số và kiểu dữ liệu (số, danh sách, checkbox)
+* Tạo phạm vi kiểm thử: giá trị bắt đầu = ½ giá trị hiện tại, kết thúc = 2× giá trị hiện tại
+* Lưu tham số kiểm thử ra file CSV để chỉnh sửa
+* Tải phạm vi tham số đã chỉnh sửa từ file CSV
+* Cấu hình mô hình tối ưu hóa:
+    * Chọn kiểu tối ưu: tìm giá trị lớn nhất hoặc nhỏ nhất
+    * Chọn chỉ số tối ưu từ danh sách kết quả Tradingview (Net Profit, Sharpe Ratio, v.v.)
+    * Chọn phương pháp tìm kiếm (ngẫu nhiên, tuần tự, annealing)
+* Lọc kết quả không phù hợp (ví dụ: số lệnh giao dịch quá ít)
+* Thiết lập số chu kỳ tìm kiếm
+* Tự động chọn tham số, lưu tất cả kết quả vào bộ nhớ trình duyệt, có thể xuất CSV (kể cả khi gặp lỗi hoặc tải lại trang)
+* Hiển thị kết quả backtest trên biểu đồ 3D để phân tích ảnh hưởng của tham số
 ![](docs/Screenshot3.png)
 
-#### Optimization Methods
-The **sequential improvements** optimization method is implement adjusting the best value already found. It does not perform a complete search of the entire parameter space.
-The logic of it work is as follows. The current best state (parameters for max results) is taken. The first parameter is taken and all its values in the range are checked sequentially. If the best result is found, then further verification is carried out from this state. Then the next parameter is taken and all its values in the range are checked and etc.
+#### Phương pháp tối ưu hóa
+- **Cải thiện tuần tự**: điều chỉnh giá trị tốt nhất đã tìm, không duyệt toàn bộ không gian.
+- **Brute force**: kiểm thử tất cả các tổ hợp tham số.
+- **Annealing**: tìm kiếm kết quả tốt nhất với [ít bước hơn](https://en.wikipedia.org/wiki/Simulated_annealing), thu hẹp phạm vi dần xung quanh giá trị tìm được.
+- **Cải thiện ngẫu nhiên**: chọn ngẫu nhiên một tham số, gán giá trị ngẫu nhiên, ghi nhớ nếu tốt hơn.
+- **Ngẫu nhiên**: luôn chọn ngẫu nhiên tất cả tham số cùng lúc (mặc định).
 
-The **brute force** optimization method implement backtesting all values in strategy space of parameters.
+### Tải tín hiệu bên ngoài lên biểu đồ Tradingview
 
-The **annealing** method is an optimization method in which the search for the maximum possible result is carried out in fewer steps https://en.wikipedia.org/wiki/Simulated_annealing
-The method works this way: first, the best state and its parameters are determined. One parameter is randomly determined, then its value from range of possible values is randomly selected. The status in this value is checked. If it is better, then it is remembered and further parameter changes are made from it.
-As the number of tests increases, the spread of parameter values decreases around those already found. That is, if at the beginning of testing the values are randomly selected from the entire range of possible parameter values, then as optimization is carried out, this spread decreases ("cools down") near current values. So in first phase of test - this method is search the most possible state around all space on the finish stage this method trying to improve found best state.
-So that the system does not get stuck in one parameter area, as it happens with the sequential method, not one random parameter changes periodically, but all at once.
-
-The **random improvements** method is the simplest. One parameter is randomly determined and then a value is randomly selected for it from the entire range of possible values. If the condition is better, then it is remembered. And then the parameters from this state are randomly changed.
-
-The **random** method - always selects random values for all parameters at once (default)
-
-
-### Upload external signals to tradingview chart
-
-Loading external buy or sell signals by timestamps from a CSV file*
+Tải tín hiệu mua/bán theo timestamp từ file CSV.
 
 ![](docs/Screenshot2.png)
 
-To display the signals, you need to create a pine script named 'iondvSignals' from the script bellow add it to the chart:
-```
-//©akumidv
-//@version=4
-study("iondv Signals", shorttitle="iondvSignals", overlay=true)
-strTSBuy = input("", "TSBuy")
-strTSBuy = input("", "TSSell")
-tickerName = input("", "Ticker")
-var arrTSBuy = str.split(buy_series_time, ",")
-var arrTSSell = str.split(sell_series_time, ",")
-plotchar(tickerName == syminfo.ticker and array.includes(arrTSBuy, tostring(time)) ? low : na, location = location.belowbar, color=color.green, char='▲')
-plotchar(tickerName == syminfo.ticker and array.includes(arrTSSell, tostring(time)) ? low : na, location = location.abovebar, color=color.red, char='▼')
-```
-
-After that, upload the signals from the file created accordingly the template
-```CSV
+Tạo pine script `iondvSignals` từ file trong popup và thêm vào biểu đồ. Sau đó tải tín hiệu từ file CSV theo mẫu:
+```csv
 timestamp,ticker,timeframe,signal
 1625718600000,BTCUSDT,1m,BUY
 2021-07-27T01:00:00Z,BABA,1H,SELL
 ```
 
-The signals are stored in the browser, to activate them, open the properties of the created indicator named 'iondvSignals'.
+Tín hiệu được lưu trong trình duyệt. Để kích hoạt, mở thuộc tính của chỉ báo `iondvSignals`.
 
-#### PS
-** The field separator for CSV files is a comma.
+> **Lưu ý:** Dấu phân cách trường trong file CSV là dấu phẩy.
 
-## Browser configuration
-If Chrome tab that have your backtest running is not active or minimized the backtest will stop working till the tab is active again.
-To avoid this :
-* Main Menu > More tools > Perfomance > Always keep these sites active > Add Button (Add TV domain)
-* Close all other tabs (except TV) > goto [chrome://discards/](chrome://discards/) > Find TV Tab(s) > Toggle Auto Discardable from ✔ to ❌
+## Cấu hình trình duyệt
+Nếu tab Chrome đang chạy backtest bị ẩn hoặc không active, backtest sẽ tạm dừng.
+Để tránh điều này:
+* Menu chính > Công cụ khác > Hiệu suất > Luôn giữ các trang này hoạt động > Thêm domain TV
+* Đóng tất cả tab khác > vào [chrome://discards/](chrome://discards/) > Tìm tab TV > Bỏ Auto Discardable
 
+## Cài đặt
 
-## Setup
+Cài từ [Chrome Web Store](https://chromewebstore.google.com/detail/tradingview-assistant/pfbdfjaonemppanfnlmliafffahlohfg)
 
-Install from [Chrome webstore](https://chromewebstore.google.com/detail/tradingview-assistant/pfbdfjaonemppanfnlmliafffahlohfg)
+Hoặc cài thủ công:
+1. Nhập `chrome://extensions` vào thanh địa chỉ, bật **Developer mode**
+2. Nhấn **Load unpacked**, chọn thư mục chứa repository (tải zip tại [đây](https://github.com/akumidv/tradingview-assistant-chrome-extension/archive/refs/heads/main.zip))
+3. File `manifest.json` nằm ở thư mục gốc của extension
 
-Or manually add the latest version to chrome based browser from this repository by following the instruction below.
+### Cập nhật
+Giải nén phiên bản mới vào cùng thư mục (nên xóa file phiên bản cũ trước). Vào `chrome://extensions` và nhấn restart cho extension.
 
-Click on the browser's address bar, insert `chrome://extensions` and follow this link. Click on the "Developer mode" switch.
+### Báo lỗi
+Tạo issue tại [link này](https://github.com/akumidv/tradingview-assistant-chrome-extension/issues). Đính kèm screenshot toàn màn hình và log từ console (F12 > Console).
 
-The "Load unpacked" button should appear. Click on it, and in the window that opens, select the folder with the saved
-repository files (you can download them as a zip archive via the
-link https://github.com/akumidv/tradingview-assistant-chrome-extension/archive/refs/heads/main.zip).
+## Chuyển đổi sang Python
 
-The `manifest.json` file is located in the root folder of the extension.
+Nếu chiến lược cần lượng lớn kiểm thử, nên chuyển sang Python và dùng Google Colab hoặc máy chủ riêng (nhanh hơn 5-100 lần). Xem ví dụ tại [trade-strategies-backtesting-optimization](https://github.com/akumidv/trade-strategies-backtesting-optimization).
 
-### Update
-Unpack the new version to the same directory as the previous version (it is better to delete the files of the previous version).
-Go to the extensions tab by following the link `chrome://extensions`. Click the restart button for the extension.
+## Liên hệ
 
-### Issues
-Please add issues in this repository by following [link](https://github.com/akumidv/tradingview-assistant-chrome-extension/issues).
-
-Very helpfull will be if you can attach full screenshot with tradingview page and errors. And also with open command tab in browser developer mode (please press F12 to open developer mode and click on console tab)
-
-
-## Translating the code into Python.
-
-If your strategy requires a large amount of testing, it is recommended to order its conversion into python and perform 
-backtesting and hyperoptimization of parameters using resources, such as Google Collab or your computer. In addition, it significantly speeds up the search for parameters (in 5-10 times per cycle) and history deep. Examples in Jupyter Notebooks in repository [trade-strategies-backtesting-optimization](https://github.com/akumidv/trade-strategies-backtesting-optimization). You can run examples in Google Collab, it's free. You would just upload files  with extension `*.ipynb` to your Google Drive and open these files.
-
-Where transfering from TradingViews scripts usually developer should solve some promblems:
-* Trading view indicators – some of them have different formulas to calculate results, for example supertrend, ta.RMA and more others. They need additional implementation and in results they calculated more slowly than if python script would use `ta-lib`.
-* Implementation of the data parsing. If the data for the crypt is mostly free, but the data of low timeframes is usually paid (for example, eodhistoricaldata). Developer need to implement an interface to them and some process to store and reuse local(cloud) stored data.
-- Difference in data for stock or forex exchanges from Tradingview. Also, for some cryptocurrency exchanges.
-- Adopt framework of backtesting (backtesting, backtrader, vectorbot, etc.) to work with strategy
-- Wrap this code for frameworks of parameter gyperspace optimization (simple example you can see in [trade-strategies-backtesting-optimization](https://github.com/akumidv/trade-strategies-backtesting-optimization)) and increase speed of backtesting with some methods.
-
-
-From my experience it demands 2-3 minutes developer time for each row of tradingview script. For example if you have 200 line strategy it would demand ~6 hours to conversion. For some complicated strategies it can demand much more.
-
-To reduce developing time you can use some my repositories: 
-* [tradingview-ta-lib](https://github.com/akumidv/tradingview-ta-lib) - Tradingview `ta` lib implementation in python (only for tradingview indecators that have different caclulatoin results with `ta-lib` or `python-ta` - early developing stage.
-* [catcher-bot](https://github.com/akumidv/catcher-bot) - Bot for screening all symbols on excahnges/exchanges and cath trade signals - early developing stage.
-
-## Contacts
-
-akumidv `[at]` yahoo.com  (Do not send errors to email please, use [github issues](https://github.com/akumidv/tradingview-assistant-chrome-extension/issues) for them)
+akumidv `[at]` yahoo.com (Không gửi lỗi qua email — dùng [github issues](https://github.com/akumidv/tradingview-assistant-chrome-extension/issues))
 
 https://linkedin.com/in/akuminov
-
-Email is preferred way, but usually I do not have the ability to answer quickly (2-3 days delay).

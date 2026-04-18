@@ -15,7 +15,7 @@ file.upload = async (handler, endOfMsg, isMultiple = false) => {
   if(isMultiple)
     fileUploadEl.multiple = 'multiple';
   fileUploadEl.addEventListener('change', async () => {
-    let message = isMultiple ? 'File upload results:\n' : 'File upload result:\n'
+    let message = isMultiple ? t('msgFileUploadResults') : t('msgFileUploadResult')
     for(let file of fileUploadEl.files) {
       message += await handler(file)
     }
@@ -31,10 +31,10 @@ file.parseCSV = async (fileData) => {
   return new Promise((resolve, reject) => {
     const CSV_FILENAME = fileData.name
     const isCSV = CSV_FILENAME.toLowerCase().endsWith('.csv')
-    if(!isCSV) return reject(`please upload correct file.`)
+    if(!isCSV) return reject(t('msgFileWrongFormat'))
     const reader = new FileReader();
     reader.addEventListener('load', async (event) => {
-      if(!event.target.result) return reject(`there error when loading content from the file ${CSV_FILENAME}`)
+      if(!event.target.result) return reject(t('msgFileLoadError', {filename: CSV_FILENAME}))
       const CSV_VALUE = event.target.result
       try {
         const csvData = parseCSV2JSON(CSV_VALUE)
@@ -42,9 +42,9 @@ file.parseCSV = async (fileData) => {
           return resolve(csvData)
       } catch (err) {
         console.error(err)
-        return reject(`CSV parsing error: ${err.message}`)
+        return reject(t('msgFileCSVError', {error: err.message}))
       }
-      return reject(`there is no data in the file`)
+      return reject(t('msgFileNoData'))
     })
     return reader.readAsText(fileData);
   });
@@ -58,7 +58,7 @@ file.uploadHandler = async (fileData) => {
   const headers = Object.keys(csvData[0])
   const missColumns = ['Name','Value'].filter(columnName => !headers.includes(columnName.toLowerCase()))
   if(missColumns && missColumns.length)
-    return `  - ${fileData.name}: There is no column(s) "${missColumns.join(', ')}" in CSV.\nPlease add all necessary columns to CSV like showed in the template.\n\nSet parameters canceled.\n`
+    return t('msgFileNoCSVColumn', {filename: fileData.name, columns: missColumns.join(', ')})
   csvData.forEach(row => {
     if(row['name'] === '__indicatorName')
       strategyName = row['value']
@@ -66,13 +66,13 @@ file.uploadHandler = async (fileData) => {
       propVal[row['name']] = row['value']
   })
   if(!strategyName)
-    return 'The name for indicator in row with name ""__indicatorName"" is missed in CSV file'
+    return t('msgFileIndicatorNameMissing')
   const res = await tv.setStrategyParams(strategyName, propVal, false, true)
   const lastSetResult = tv.lastSetStrategyResult || {}
   if (res) {
-    return 'All settings applied successfully.'
+    return t('msgFileApplied')
   }
-  return `The name "${strategyName}" of the indicator from the file does not match the name in the open window`
+  return t('msgFileNameMismatch', {name: strategyName})
 }
 
 function parseCSV2JSON(s, sep= ',') {
@@ -113,18 +113,17 @@ function parseCSVLine(text) {
 
 
 
-file.convertResultsToCSV = (testResults) => {
+file.convertResultsToCSV = (testResults, outputConfig) => {
   function prepareValToCSV(value) {
     if (!value)
       return 0
     if (typeof value !== 'number')
       return JSON.stringify(value)
     return parseFloat(value) === parseInt(value) ? parseInt(value) : parseFloat(value)
-    // return (Math.round(value * 100)/100).toFixed(2)
   }
 
   if(!testResults || !testResults.perfomanceSummary || !testResults.perfomanceSummary.length)
-    return 'There is no data for conversion'
+    return t('msgFileNoConvData')
   let headers = Object.keys(testResults.perfomanceSummary[0]) // The first test table can be with error and can't have rows with previous values when parsedReport
   if(testResults.hasOwnProperty('paramsNames') && headers.length <= (Object.keys(testResults.paramsNames).length + 1)) { // Find the another header if only params names and 'comment' in headers
     const headersAll = testResults.perfomanceSummary.find(report => Object.keys(report).length > headers.length)
@@ -132,15 +131,44 @@ file.convertResultsToCSV = (testResults) => {
       headers = Object.keys(headersAll)
   }
 
+  if (outputConfig && outputConfig.columns && outputConfig.columns.length) {
+    const visibleCols = outputConfig.columns.filter(c => c.visible).map(c => c.key)
+    if (visibleCols.length) {
+      headers = headers.filter(h => visibleCols.includes(h))
+      headers.sort((a, b) => {
+        const ia = visibleCols.indexOf(a)
+        const ib = visibleCols.indexOf(b)
+        return (ia < 0 ? 9999 : ia) - (ib < 0 ? 9999 : ib)
+      })
+    }
+  }
+
+  function rowPassesCondition(row) {
+    if (!outputConfig || !outputConfig.conditionEnabled || !outputConfig.conditionMetric) return true
+    const val = row[outputConfig.conditionMetric]
+    if (val === undefined) return true
+    const num = parseFloat(val)
+    const threshold = outputConfig.conditionValue
+    switch (outputConfig.conditionOp) {
+      case '>': return num > threshold
+      case '<': return num < threshold
+      case '>=': return num >= threshold
+      case '<=': return num <= threshold
+      case '=': return num === threshold
+      default: return true
+    }
+  }
+
   let csv = headers.map(header => JSON.stringify(header)).join(',')
   csv += '\n'
   testResults.perfomanceSummary.forEach(row => {
+    if (!rowPassesCondition(row)) return
     const rowData = headers.map(key => typeof row[key] === 'undefined' ? '' : prepareValToCSV(row[key]))
     csv += rowData.join(',').replaceAll('\\"', '""')
     csv += '\n'
   })
   if(testResults.filteredSummary && testResults.filteredSummary.length) {
-    csv += headers.map(key => key !== 'comment' ? '' : 'Bellow filtered results of tests') // Empty line
+    csv += headers.map(key => key !== 'comment' ? '' : t('msgFileFilteredResults'))
     csv += '\n'
     testResults.filteredSummary.forEach(row => {
       const rowData = headers.map(key => typeof row[key] === 'undefined' ? '' : prepareValToCSV(row[key]))

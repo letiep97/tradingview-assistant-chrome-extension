@@ -3,13 +3,13 @@ const action = {
 }
 
 const message = {
-  errorsNoBacktest: 'There is no backtest data. Try to do a new backtest'
+  get errorsNoBacktest() { return t('msgNoBacktest') }
 }
 
 action.saveParameters = async () => {
   const strategyData = await tv.getStrategy(null, true)
   if (!strategyData || !strategyData.hasOwnProperty('name') || !strategyData.hasOwnProperty('properties') || !strategyData.properties) {
-    await ui.showErrorPopup('The current indicator/strategy do not contain inputs that can be saved.')
+    await ui.showErrorPopup(t('msgNoStrategy'))
     // await ui.showWarningPopup('Please open the indicator (strategy) parameters window before saving them to a file.')
     return
   }
@@ -25,7 +25,7 @@ action.loadParameters = async () => {
 }
 
 action.uploadSignals = async () => {
-  await file.upload(signal.parseTSSignalsAndGetMsg, `Please check if the ticker and timeframe are set like in the downloaded data and click on the parameters of the "iondvSignals" script to automatically enter new data on the chart.`, true)
+  await file.upload(signal.parseTSSignalsAndGetMsg, t('msgUploadSignalHint'), true)
 }
 
 action.uploadStrategyTestParameters = async () => {
@@ -35,20 +35,20 @@ action.uploadStrategyTestParameters = async () => {
 action.getStrategyTemplate = async () => {
   const strategyData = await tv.getStrategy()
   if (!strategyData || !strategyData.hasOwnProperty('name') || !strategyData.hasOwnProperty('properties') || !strategyData.properties) {
-    await ui.showErrorPopup('The current strategy do not contain inputs, than can be saved')
+    await ui.showErrorPopup(t('msgNoInputsOptimize'))
   } else {
     const paramRange = model.getStrategyRange(strategyData)
     console.log(paramRange)
     // await storage.setKeys(storage.STRATEGY_KEY_PARAM, paramRange)
     const strategyRangeParamsCSV = model.convertStrategyRangeToTemplate(paramRange)
-    await ui.showPopup('The range of parameters is saved for the current strategy.\n\nYou can start optimizing the strategy parameters by clicking on the "Test strategy" button')
+    await ui.showPopup(t('msgTemplateSaved'))
     file.saveAs(strategyRangeParamsCSV, `${strategyData.name}.csv`)
   }
 }
 
 action.clearAll = async () => {
   const clearRes = await storage.clearAll()
-  await ui.showPopup(clearRes && clearRes.length ? `The data was deleted: \n${clearRes.map(item => '- ' + item).join('\n')}` : 'There was no data in the storage')
+  await ui.showPopup(clearRes && clearRes.length ? t('msgClearResult', {list: clearRes.map(item => '- ' + item).join('\n')}) : t('msgClearEmpty'))
 }
 
 action.previewStrategyTestResults = async () => {
@@ -73,7 +73,9 @@ action.downloadStrategyTestResults = async () => {
   }
   testResults.optParamName = testResults.optParamName || backtest.DEF_MAX_PARAM_NAME
   console.log('downloadStrategyTestResults', testResults)
-  const CSVResults = file.convertResultsToCSV(testResults)
+  let outputConfig = null
+  try { outputConfig = await storage.getKey('output_config') } catch {}
+  const CSVResults = file.convertResultsToCSV(testResults, outputConfig)
   const bestResult = testResults.perfomanceSummary ? model.getBestResult(testResults) : {}
   const propVal = {}
   testResults.paramsNames.forEach(paramName => {
@@ -82,7 +84,7 @@ action.downloadStrategyTestResults = async () => {
   })
   await tv.setStrategyParams(testResults.shortName, propVal)
   if (bestResult && bestResult.hasOwnProperty(testResults.optParamName))
-    await ui.showPopup(`The best found parameters are set for the strategy\n\nThe best ${testResults.isMaximizing ? '(max) ' : '(min)'} ${testResults.optParamName}: ` + bestResult[testResults.optParamName])
+    await ui.showPopup(t('msgBestParamsSet', {minmax: testResults.isMaximizing ? '(max)' : '(min)', param: testResults.optParamName, value: bestResult[testResults.optParamName]}))
   file.saveAs(CSVResults, `${testResults.ticker}:${testResults.timeFrame} ${testResults.shortName} - ${testResults.cycles}_${testResults.isMaximizing ? 'max' : 'min'}_${testResults.optParamName}_${testResults.method}.csv`)
 }
 
@@ -97,12 +99,12 @@ action.testStrategy = async (request, isDeepTest = false) => {
     if (allRangeParams !== null) { // click cancel on parameters
       const testParams = await action._getTestParams(request, strategyData, allRangeParams, paramRange, cycles, isDeepTest)
       console.log('Test parameters', testParams)
-      action._showStartMsg(testParams.paramSpace, testParams.cycles, testParams.backtestDelay ? ` with delay between tests ${testParams.backtestDelay} sec` : '')
+      action._showStartMsg(testParams.paramSpace, testParams.cycles, testParams.backtestDelay ? t('msgDelay', {delay: testParams.backtestDelay}) : '')
       testParams.isDeepTest = isDeepTest
       let testResults = {}
       if (testParams.shouldTestTF) {
         if (!testParams.listOfTF || testParams.listOfTF.length === 0) {
-          await ui.showWarningPopup(`You set to test timeframes in options, but timeframes list after correction values is empty: ${testParams.listOfTFSource}\nPlease set correct one with separation by comma. \nFor example: 1m,4h`)
+          await ui.showWarningPopup(t('msgNoTestTF', {list: testParams.listOfTFSource}))
         } else {
           let bestValue = null
           let bestTf = null
@@ -130,9 +132,9 @@ action.testStrategy = async (request, isDeepTest = false) => {
             }
           }
           if (bestValue !== null) {
-            await ui.showPopup(`The best value ${bestValue} for timeframe ${bestTf}. Check the saved files to get the best result parameters`)
+            await ui.showPopup(t('msgBestTF', {value: bestValue, tf: bestTf}))
           } else {
-            await ui.showWarningPopup(`Did not found any result value after testing`)
+            await ui.showWarningPopup(t('msgNoResultTF'))
           }
         }
       } else {
@@ -170,22 +172,37 @@ action._getRangeParams = async (strategyData) => {
     await model.saveStrategyParameters(paramRange)
     console.log('ParamRange changes to', paramRange)
   } else {
-    throw new Error('The strategy parameters invalid. Change them or run default parameters set.')
+    throw new Error(t('msgInvalidParams'))
   }
 
   const allRangeParams = model.createParamsFromRange(paramRange)
   console.log('allRangeParams', allRangeParams)
   if (!allRangeParams) {
-    throw new Error('Empty range parameters for strategy')
+    throw new Error(t('msgEmptyRange'))
+  }
+
+  let lastColumns = []
+  try {
+    const lastResults = await storage.getKey(storage.STRATEGY_KEY_RESULTS)
+    if (lastResults && lastResults.perfomanceSummary && lastResults.perfomanceSummary.length) {
+      const fullRow = lastResults.perfomanceSummary.find(r =>
+        Object.keys(r).length > (Object.keys(lastResults.paramsNames || {}).length + 1)
+      ) || lastResults.perfomanceSummary[0]
+      if (fullRow) lastColumns = Object.keys(fullRow)
+    }
+  } catch {}
+  const outputConfig = await ui.showOutputConfig(lastColumns)
+  if (outputConfig !== null) {
+    await storage.setKeys('output_config', outputConfig)
   }
   return [allRangeParams, paramRange, cycles]
 }
 
 action._getStrategyData = async (isDeepTest) => {
-  ui.statusMessage('Get the initial parameters.')
+  ui.statusMessage(t('statusGetInitialParams'))
   const strategyData = await tv.getStrategy('', false, isDeepTest)
   if (!strategyData || !strategyData.hasOwnProperty('name') || !strategyData.hasOwnProperty('properties') || !strategyData.properties) {
-    throw new Error('The current strategy do not contain inputs, than can be optimized. You can choose another strategy to optimize.')
+    throw new Error(t('msgNoInputsOptimize'))
   }
   return strategyData
 }
@@ -251,19 +268,21 @@ action._getTestParams = async (request, strategyData, allRangeParams, paramRange
 
 
 action._showStartMsg = (paramSpaceNumber, cycles, addInfo) => {
-  let extraHeader = `The search is performed among ${paramSpaceNumber} possible combinations of parameters (space).`
-  extraHeader += (paramSpaceNumber / cycles) > 10 ? `<br />This is too large for ${cycles} cycles. It is recommended to use up to 3-4 essential parameters, remove the rest from the strategy parameters file.` : ''
-  ui.statusMessage(`Started${addInfo}.`, extraHeader)
+  let extraHeader = t('msgSearchSpace', {num: paramSpaceNumber})
+  extraHeader += (paramSpaceNumber / cycles) > 10 ? '<br />' + t('msgSpaceTooLarge', {cycles}) : ''
+  ui.statusMessage(t('msgStarted', {info: addInfo}), extraHeader)
 }
 
 action._saveTestResults = async (testResults, testParams, isFinalTest = true) => {
   console.log('testResults', testResults)
   if (!testResults.perfomanceSummary && !testResults.perfomanceSummary.length) {
-    await ui.showWarningPopup('There is no testing data for saving. Try to do test again')
+    await ui.showWarningPopup(t('msgNoSaveData'))
     return
   }
 
-  const CSVResults = file.convertResultsToCSV(testResults)
+  let outputConfig = null
+  try { outputConfig = await storage.getKey('output_config') } catch {}
+  const CSVResults = file.convertResultsToCSV(testResults, outputConfig)
   const bestResult = testResults.perfomanceSummary ? model.getBestResult(testResults) : {}
   const initBestValue = testResults.hasOwnProperty('initBestValue') ? testResults.initBestValue : null
   const propVal = {}
@@ -273,9 +292,9 @@ action._saveTestResults = async (testResults, testParams, isFinalTest = true) =>
   })
   if (isFinalTest)
     await tv.setStrategyParams(testResults.shortName, propVal)
-  let text = `All done.\n\n`
-  text += bestResult && bestResult.hasOwnProperty(testParams.optParamName) ? 'The best ' + (testResults.isMaximizing ? '(max) ' : '(min) ') + testParams.optParamName + ': ' + backtest.convertValue(bestResult[testParams.optParamName]) : ''
-  text += (initBestValue !== null && bestResult && bestResult.hasOwnProperty(testParams.optParamName) && initBestValue === bestResult[testParams.optParamName]) ? `\nIt isn't improved from the initial value: ${backtest.convertValue(initBestValue)}` : ''
+  let text = t('msgAllDone') + '\n\n'
+  text += bestResult && bestResult.hasOwnProperty(testParams.optParamName) ? t('msgBestResult', {minmax: testResults.isMaximizing ? '(max)' : '(min)', param: testParams.optParamName, value: backtest.convertValue(bestResult[testParams.optParamName])}) : ''
+  text += (initBestValue !== null && bestResult && bestResult.hasOwnProperty(testParams.optParamName) && initBestValue === bestResult[testParams.optParamName]) ? '\n' + t('msgNotImproved', {value: backtest.convertValue(initBestValue)}) : ''
   ui.statusMessage(text)
   console.log(`All done.\n\n${bestResult && bestResult.hasOwnProperty(testParams.optParamName) ? 'The best ' + (testResults.isMaximizing ? '(max) ' : '(min) ') + testParams.optParamName + ': ' + bestResult[testParams.optParamName] : ''}`)
   if (testParams.shouldSkipWaitingForDownload || !isFinalTest)
@@ -291,7 +310,7 @@ action._saveTestResults = async (testResults, testParams, isFinalTest = true) =>
 action.show3DChart = async () => {
   const testResults = await storage.getKey(storage.STRATEGY_KEY_RESULTS)
   if (!testResults || (!testResults.perfomanceSummary && !testResults.perfomanceSummary.length)) {
-    await ui.showPopup('There is no results data for to show. Try to backtest again')
+    await ui.showPopup(t('msg3DNoData'))
     return
   }
   testResults.optParamName = testResults.optParamName || backtest.DEF_MAX_PARAM_NAME

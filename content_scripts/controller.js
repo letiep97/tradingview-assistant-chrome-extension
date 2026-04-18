@@ -16,7 +16,7 @@
         return sendResponse()
       }
       if(action.workerStatus !== null) {
-        const msg = `Waiting for end previous work. Status: ${action.workerStatus}`
+        const msg = t('msgWaitingPrev', {status: action.workerStatus})
         console.log(msg)
         ui.autoCloseAlert(msg)
         return sendResponse()
@@ -66,7 +66,7 @@
         }
       } catch (err) {
         console.error(err)
-        await ui.showErrorPopup(`An error has occurred.\n\nReload the page and try again.\nYou can describe the problem by following <a href="https://github.com/akumidv/tradingview-assistant-chrome-extension/issues" target="_blank">the link</a>.\n\nError message: ${err.message}`)
+        await ui.showErrorPopup(t('msgErrorOccurred', {error: err.message}))
       }
       action.workerStatus = null
       ui.statusMessageRemove()

@@ -8,14 +8,14 @@ signal.parseTSSignalsAndGetMsg = async (fileData) => {
     const headers = Object.keys(csvData[0])
     const missColumns = ['timestamp', 'ticker', 'timeframe', 'signal'].filter(columnName => !headers.includes(columnName))
     if(missColumns && missColumns.length)
-      return `  - ${fileData.name}: There is no column(s) "${missColumns.join(', ')}" in CSV. Please add all necessary columns to CSV like showed in the template. Uploading canceled.\n`
+      return t('msgSignalNoColumn', {filename: fileData.name, columns: missColumns.join(', ')})
     const tickersAndTFSignals = {}
     for(let row of csvData) { // Prepare timestamp arrays
       if(row['timestamp'] && row['signal'] && row['ticker'] && row['timeframe'] && row['timeframe'].length >= 2) {
         try {
           const [tfVal, tfType] = parseTF(row['timeframe'])
           if(!['h', 'm', 'd'].includes(tfType) || !(tfVal > 0))
-            return `  - ${fileData.name}: only minute(m) and hour(h) timeframes are supported. There is a timeframe "${row['timeframe']}" in the file. Uploading canceled.\n`
+            return t('msgSignalUnsupportedTF', {filename: fileData.name, tf: row['timeframe']})
           const tktfName = `${row['ticker']}::${tfVal}${tfType}`.toLowerCase()
           if(!tickersAndTFSignals.hasOwnProperty(tktfName))
             tickersAndTFSignals[tktfName] = {tsBuy: [], tsSell: []}
@@ -52,11 +52,11 @@ signal.parseTSSignalsAndGetMsg = async (fileData) => {
         console.error(err)
       }
     }
-    return `- ${fileData.name}. Timestamps saved for tickers: ${msgArr.join(', ')}. Data saved in storage.\n`
+    return t('msgSignalSaved', {filename: fileData.name, tickers: msgArr.join(', ')})
   } catch (err) {
     console.error(fileData.name)
     console.error(err)
-    return `- ${fileData.name}: ${err.message}\n`
+    return t('msgSignalError', {filename: fileData.name, error: err.message})
   }
 }
 

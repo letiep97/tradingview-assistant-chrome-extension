@@ -26,7 +26,7 @@ backtest.testStrategy = async (testResults, strategyData, allRangeParams) => {
   testResults.paramsNames = Object.keys(allRangeParams)
 
   // Get best init value and properties values
-  ui.statusMessage('Get the best initial values.')
+  ui.statusMessage(t('statusGetInit'))
 
 
   const initRes = await getInitBestValues(testResults) // allRangeParams
@@ -36,7 +36,7 @@ backtest.testStrategy = async (testResults, strategyData, allRangeParams) => {
     testResults.bestPropVal = initRes.bestPropVal
     testResults.perfomanceSummary.push(initRes.data)
     try {
-      ui.statusMessage(`<p>From default and previous tests. Best "${testResults.optParamName}": ${backtest.convertValue(testResults.bestValue)}</p>`)
+      ui.statusMessage('<p>' + t('statusInitBest', {param: testResults.optParamName, value: backtest.convertValue(testResults.bestValue)}) + '</p>')
       console.log('Init best value', testResults.bestValue)
       // console.log(testResults.perfomanceSummary)
     } catch {
@@ -111,18 +111,20 @@ backtest.testStrategy = async (testResults, strategyData, allRangeParams) => {
       testResults.bestValue = optRes.bestValue
       testResults.bestPropVal = optRes.bestPropVal
       try {
-        let text = `<p>Cycle: ${i + 1}/${testResults.cycles} (${durationTime}[${setTime}/${parseTime}]/${avgTime} sec). Best "${testResults.optParamName}": ${backtest.convertValue(testResults.bestValue)}</p>`
-        text += optRes.hasOwnProperty('currentValue') ? `<p>Current "${testResults.optParamName}": ${backtest.convertValue(optRes.currentValue)}</p>` : ''
+        let text = '<p>' + t('statusCycle', {cur: i+1, total: testResults.cycles, dur: durationTime, set: setTime, parse: parseTime, avg: avgTime, param: testResults.optParamName, value: backtest.convertValue(testResults.bestValue)}) + '</p>'
+        text += optRes.hasOwnProperty('currentValue') ? '<p>' + t('statusCurrent', {param: testResults.optParamName, value: backtest.convertValue(optRes.currentValue)}) + '</p>' : ''
         text += optRes.error !== null ? `<p style="color: red">${optRes.message}</p>` : optRes.message ? `<p>${optRes.message}</p>` : ''
         ui.statusMessage(text)
+        try { ui.updatePreviewTable(testResults.perfomanceSummary) } catch {}
       } catch {
       }
     } else {
       try {
-        let text = `<p>Cycle: ${i + 1}/${testResults.cycles}. Best "${testResults.optParamName}": ${backtest.convertValue(testResults.bestValue)}</p>`
-        text += optRes.currentValue ? `<p>Current "${testResults.optParamName}": ${backtest.convertValue(optRes.currentValue)}</p>` : `<p>Current "${testResults.optParamName}": error</p>`
+        let text = '<p>' + t('statusCycleSimple', {cur: i+1, total: testResults.cycles, param: testResults.optParamName, value: backtest.convertValue(testResults.bestValue)}) + '</p>'
+        text += optRes.currentValue ? '<p>' + t('statusCurrent', {param: testResults.optParamName, value: backtest.convertValue(optRes.currentValue)}) + '</p>' : '<p>' + t('statusCurrentError', {param: testResults.optParamName}) + '</p>'
         text += optRes.error !== null ? `<p style="color: red">${optRes.message}</p>` : optRes.message ? `<p>${optRes.message}</p>` : ''
         ui.statusMessage(text)
+        try { ui.updatePreviewTable(testResults.perfomanceSummary) } catch {}
       } catch {
       }
     }
