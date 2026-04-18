@@ -97,11 +97,6 @@ const IONDV_STRINGS = {
 
     // Output Config modal
     outputConfigTitle: 'Cấu hình đầu ra',
-    outputConditionTitle: 'Điều kiện lưu kết quả',
-    outputConditionEnable: 'Bật điều kiện',
-    outputConditionMetric: 'Chỉ số',
-    outputConditionOp: 'Toán tử',
-    outputConditionValue: 'Ngưỡng',
     outputColumnsTitle: 'Cột hiển thị trong file CSV',
     outputColumnsHint: 'Kéo thả để thay đổi thứ tự. Bỏ chọn để ẩn cột.',
     btnConfirmOutput: 'Xác nhận',
@@ -179,7 +174,6 @@ const IONDV_STRINGS = {
     outputSelectAll: 'Chọn tất cả',
     outputDeselectAll: 'Bỏ chọn tất cả',
     outputColsPlaceholder: 'Cột CSV sẽ hiển thị sau lần kiểm thử đầu tiên.',
-    msgConditionEmpty: 'Điều kiện lọc đang bật nhưng Chỉ số hoặc Ngưỡng đang trống.',
     stratParamSpaceZero: 'Chưa chọn tham số nào!',
   },
 
@@ -275,11 +269,6 @@ const IONDV_STRINGS = {
 
     // Output Config modal
     outputConfigTitle: 'Output Configuration',
-    outputConditionTitle: 'Save condition',
-    outputConditionEnable: 'Enable condition',
-    outputConditionMetric: 'Metric',
-    outputConditionOp: 'Operator',
-    outputConditionValue: 'Threshold',
     outputColumnsTitle: 'Columns in CSV output',
     outputColumnsHint: 'Drag to reorder. Uncheck to hide column.',
     btnConfirmOutput: 'Confirm',
@@ -357,7 +346,6 @@ const IONDV_STRINGS = {
     outputSelectAll: 'Select all',
     outputDeselectAll: 'Deselect all',
     outputColsPlaceholder: 'CSV columns will appear after the first test run.',
-    msgConditionEmpty: 'Filter condition is enabled but Metric or Threshold is empty.',
     stratParamSpaceZero: 'No parameters selected!',
   }
 }

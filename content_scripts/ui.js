@@ -635,11 +635,6 @@ ui.showOutputConfig = async (columns) => {
     let savedConfig = {}
     try { savedConfig = (await storage.getKey('output_config')) || {} } catch {}
 
-    const condEnabled = !!savedConfig.conditionEnabled
-    const condMetric = savedConfig.conditionMetric || ''
-    const condOp = savedConfig.conditionOp || '>'
-    const condValue = savedConfig.conditionValue !== undefined ? savedConfig.conditionValue : ''
-
     let colList = []
     if (savedConfig.columns && savedConfig.columns.length) {
       colList = savedConfig.columns.filter(c => !columns.length || columns.includes(c.key))
@@ -657,12 +652,6 @@ ui.showOutputConfig = async (columns) => {
     const popup = overlay.appendChild(document.createElement('div'))
     popup.setAttribute('style', 'background:white;color:black;width:500px;max-height:80vh;overflow-y:auto;position:fixed;top:50px;left:0;right:0;margin:auto;border:1px solid lightblue;box-shadow:3px 3px 7px #777;padding:15px;font-family:sans-serif;')
 
-    const opsHtml = ['>', '<', '>=', '<=', '='].map(op =>
-      `<option value="${op}" ${condOp === op ? 'selected' : ''}>${op}</option>`).join('')
-
-    const metricHtml = colList.length > 0
-      ? `<select id="iondvOutMetric" style="background:#f1f1f1;max-width:220px;">${colList.map(c => `<option value="${c.key}" ${condMetric === c.key ? 'selected' : ''}>${c.key}</option>`).join('')}</select>`
-      : `<input id="iondvOutMetric" type="text" value="${condMetric}" style="width:180px;background:#f1f1f1;padding:2px 4px;">`
     const visibleCount = colList.filter(c => c.visible).length
 
     const colsHtml = colList.map((c, i) =>
@@ -675,14 +664,6 @@ ui.showOutputConfig = async (columns) => {
     const btnStyle = 'background:white;padding:8px 14px;cursor:pointer;border-radius:3px;font-size:14px;'
     popup.innerHTML = `
       <h2 style="margin:0 0 12px;font-size:16px;">${t('outputConfigTitle')}</h2>
-      <fieldset style="margin-bottom:12px;padding:8px;border:1px solid #ccc;">
-        <legend style="font-size:13px;">${t('outputConditionTitle')}</legend>
-        <label style="font-size:13px;"><input type="checkbox" id="iondvOutCondEnable" ${condEnabled ? 'checked' : ''}> ${t('outputConditionEnable')}</label><br><br>
-        <label style="font-size:13px;">${t('outputConditionMetric')}: ${metricHtml}</label><br><br>
-        <label style="font-size:13px;">${t('outputConditionOp')}: <select id="iondvOutOp" style="background:#f1f1f1;">${opsHtml}</select>
-        &nbsp;${t('outputConditionValue')}: <input id="iondvOutValue" type="number" value="${condValue}" style="width:80px;background:#f1f1f1;padding:2px 4px;"></label>
-        <div id="iondvOutCondErr" style="color:red;font-size:11px;margin-top:4px;display:none;"></div>
-      </fieldset>
       ${colList.length ? `<fieldset style="padding:8px;border:1px solid #ccc;">
         <legend style="font-size:13px;">${t('outputColumnsTitle')} <span id="iondvColCount" style="font-weight:normal;color:#777;">(${visibleCount}/${colList.length})</span></legend>
         <div style="display:flex;gap:10px;margin-bottom:6px;">
@@ -742,22 +723,7 @@ ui.showOutputConfig = async (columns) => {
 
     document.getElementById('iondvOutCancel').onclick = () => { removeModal(); resolve(null) }
     document.getElementById('iondvOutConfirm').onclick = () => {
-      const condEnabledVal = document.getElementById('iondvOutCondEnable').checked
-      const metricVal = document.getElementById('iondvOutMetric').value.trim()
-      const valueVal = document.getElementById('iondvOutValue').value
-      const errEl = document.getElementById('iondvOutCondErr')
-      if (condEnabledVal && (!metricVal || valueVal === '')) {
-        if (errEl) { errEl.textContent = t('msgConditionEmpty'); errEl.style.display = 'block' }
-        return
-      }
-      if (errEl) errEl.style.display = 'none'
-      const cfg = {
-        conditionEnabled: condEnabledVal,
-        conditionMetric: metricVal,
-        conditionOp: document.getElementById('iondvOutOp').value,
-        conditionValue: parseFloat(valueVal) || 0,
-        columns: []
-      }
+      const cfg = { columns: [] }
       if (colListEl) {
         Array.from(colListEl.children).forEach(li => {
           const cb = li.querySelector('input[type="checkbox"]')

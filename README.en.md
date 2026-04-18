@@ -155,6 +155,23 @@ Please add issues in this repository by following [link](https://github.com/akum
 Very helpful will be if you can attach full screenshot with tradingview page and errors. And also with open command tab in browser developer mode (please press F12 to open developer mode and click on console tab)
 
 
+## Translating the code into Python
+
+If your strategy requires a large amount of testing, it is recommended to convert it to Python and perform backtesting/hyperoptimization using Google Colab or your own server (5-10x faster per cycle, deeper history). See examples at [trade-strategies-backtesting-optimization](https://github.com/akumidv/trade-strategies-backtesting-optimization) — you can run them directly on Google Colab for free (upload `*.ipynb` files to Google Drive and open).
+
+When converting from TradingView scripts, common issues include:
+* **Different indicator formulas**: some indicators (supertrend, `ta.RMA`, etc.) produce different results than `ta-lib` in Python and need to be reimplemented.
+* **Data**: crypto data is mostly free, but low timeframes are usually paid (e.g. eodhistoricaldata). Requires implementing an interface and local/cloud storage.
+* **Data discrepancies**: stock/forex/crypto data on TV may differ from actual exchange data.
+* **Framework integration**: backtesting, backtrader, vectorbt, etc.
+* **Hyperoptimization**: wrapping code into a parameter optimization framework.
+
+From experience: ~2-3 minutes of developer time per line of script. A 200-line strategy ≈ 6 hours to convert.
+
+Useful repositories:
+* [tradingview-ta-lib](https://github.com/akumidv/tradingview-ta-lib) — TV `ta` lib implementation in Python
+* [catcher-bot](https://github.com/akumidv/catcher-bot) — bot for screening signals across exchanges
+
 ## Contacts
 
 akumidv `[at]` yahoo.com  (Do not send errors to email please, use [github issues](https://github.com/akumidv/tradingview-assistant-chrome-extension/issues) for them)

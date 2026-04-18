@@ -143,26 +143,9 @@ file.convertResultsToCSV = (testResults, outputConfig) => {
     }
   }
 
-  function rowPassesCondition(row) {
-    if (!outputConfig || !outputConfig.conditionEnabled || !outputConfig.conditionMetric) return true
-    const val = row[outputConfig.conditionMetric]
-    if (val === undefined) return true
-    const num = parseFloat(val)
-    const threshold = outputConfig.conditionValue
-    switch (outputConfig.conditionOp) {
-      case '>': return num > threshold
-      case '<': return num < threshold
-      case '>=': return num >= threshold
-      case '<=': return num <= threshold
-      case '=': return num === threshold
-      default: return true
-    }
-  }
-
   let csv = headers.map(header => JSON.stringify(header)).join(',')
   csv += '\n'
   testResults.perfomanceSummary.forEach(row => {
-    if (!rowPassesCondition(row)) return
     const rowData = headers.map(key => typeof row[key] === 'undefined' ? '' : prepareValToCSV(row[key]))
     csv += rowData.join(',').replaceAll('\\"', '""')
     csv += '\n'
