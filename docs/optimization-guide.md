@@ -63,7 +63,7 @@
   | 9 | ~65,736 |
   | 10 | ~262,344 |
 
-  Pattern: iterations scale approximately as `4^(n-2)` for n ≥ 3. Use this to estimate cycles budget before running. If the required iterations exceed your time budget, reduce the number of params or shrink the range per param.
+  Pattern: for 7+ params, each additional param multiplies required iterations by ~4×. For fewer params the growth is irregular (see table). Use this table to estimate cycles budget before running. If the required iterations exceed your time budget, reduce the number of params or shrink the range per param.
 
 ---
 
@@ -205,12 +205,12 @@ paramPriority: most influential param first
 Filter: keep same as Round 1
 ```
 
-### Step 6 — Merging Results
+### Step 6 — Saving Results Between Rounds
 
-- The extension accumulates results across runs (stored in browser storage).
-- Reloading or re-running **appends** to existing results, not replaces.
-- So Round 1 + Round 2 results will both appear in the final CSV download.
-- AI should remind user to download CSV after Round 1 before starting Round 2 with different range settings, because changing ranges resets the param range config.
+- Each new run **resets** `perfomanceSummary` — storage is overwritten, not appended.
+- **Download CSV after every run** before starting Round 2, or results will be lost.
+- What carries over across runs: the **best params found** (used as the starting state for the next run's init phase). The full result set does not carry over.
+- Mid-run page reload: safe — results are saved incrementally to storage during the run, so partial results are recovered on reload.
 
 ---
 
