@@ -24,7 +24,7 @@
 - **When to use:** You want to explore the full space uniformly, or compare against other methods.
 
 ### `random improvement` *(default)*
-- Init: all params picked randomly.
+- Init: starts from best of {current strategy params, default params, previously stored best} — **not random**. Falls back to random only if none available.
 - Each iteration: picks **one random param**, assigns a random value **different from current best**. Keeps new state only if result is better.
 - Stays near best found state. Can get stuck in local optima.
 - **When to use:** 3–5 params, large search space, medium cycle budget.
@@ -33,8 +33,8 @@
 - Scans each param one at a time in `paramPriority` order, testing all values in range.
 - When the best value for param N is found, moves to param N+1 using that best value as base.
 - Terminates early (returns `null`) when all params are scanned — cycles is just an upper bound.
-- **Risk:** if params are interdependent, fixing one before optimizing the next gives suboptimal results.
-- **When to use:** 2–3 params that are mostly independent. Params with higher impact → lower priority number (scanned first).
+- **Risk:** if params are strongly coupled (changing A significantly shifts optimal B), fixing one before optimizing the next gives suboptimal results.
+- **When to use:** 2–3 params with weak coupling. Params with higher expected impact → lower priority number (scanned first).
 
 ### `brute force`
 - Tests every combination in `paramPriority` order (nested loop over all params).
@@ -47,7 +47,7 @@
 - When `T` is high (early): changes **all params** simultaneously (exploration).
 - When `T` is low (late): changes **one param** at a time (exploitation, like `random improvement`).
 - Accepts worse solutions with probability `exp(-ΔE / T)` — helps escape local optima.
-- **When to use:** 5+ params, or params that are interdependent. Needs enough cycles to cool slowly.
+- **When to use:** 5+ params, or params with strong coupling (e.g., fast/slow EMA pair, SL/TP ratio). Needs enough cycles to cool slowly.
 - **Raw benchmark data** (from `annealing.js`, 10 values/param grid, averaged over 10 runs, goal = find global optimum):
 
   | Params (dims) | Avg iterations to converge |
@@ -78,9 +78,9 @@ How many params to optimize?
 │       └── ≥ 20 values → sequential
 │
 ├── 3–4 params
-│   └── Are params independent of each other?
-│       ├── Yes → sequential or random improvement
-│       └── No (interdependent) → annealing
+│   └── Coupling strength between params?
+│       ├── Weak (different indicator groups) → sequential or random improvement
+│       └── Strong (same pair: fast/slow, SL/TP) → annealing
 │
 └── 5+ params
     └── annealing (random improvement will likely stall)
