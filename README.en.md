@@ -101,33 +101,56 @@ historical fit, meaning that it may not work as well in the future.
 
 #### Optimization Methods
 The **sequential improvements** optimization method is implement adjusting the best value already found. It does not perform a complete search of the entire parameter space.
+The logic of it work is as follows. The current best state (parameters for max results) is taken. The first parameter is taken and all its values in the range are checked sequentially. If the best result is found, then further verification is carried out from this state. Then the next parameter is taken and all its values in the range are checked and etc.
 
 The **brute force** optimization method implement backtesting all values in strategy space of parameters.
 
 The **annealing** method is an optimization method in which the search for the maximum possible result is carried out in fewer steps https://en.wikipedia.org/wiki/Simulated_annealing
+The method works this way: first, the best state and its parameters are determined. One parameter is randomly determined, then its value from range of possible values is randomly selected. The status in this value is checked. If it is better, then it is remembered and further parameter changes are made from it.
+As the number of tests increases, the spread of parameter values decreases around those already found. That is, if at the beginning of testing the values are randomly selected from the entire range of possible parameter values, then as optimization is carried out, this spread decreases ("cools down") near current values. So in first phase of test - this method is search the most possible state around all space on the finish stage this method trying to improve found best state.
+So that the system does not get stuck in one parameter area, as it happens with the sequential method, not one random parameter changes periodically, but all at once.
 
-The **random improvements** method is the simplest. One parameter is randomly determined and then a value is randomly selected for it from the entire range of possible values. If the condition is better, then it is remembered.
+The **random improvements** method is the simplest. One parameter is randomly determined and then a value is randomly selected for it from the entire range of possible values. If the condition is better, then it is remembered. And then the parameters from this state are randomly changed.
 
 The **random** method - always selects random values for all parameters at once (default)
 
 
 ### Upload external signals to tradingview chart
 
-Loading external buy or sell signals by timestamps from a CSV file
+Loading external buy or sell signals by timestamps from a CSV file*
 
 ![](docs/Screenshot2.png)
 
-After creating the `iondvSignals` pine script and adding it to the chart, upload the signals from a CSV file with the template:
+To display the signals, you need to create a pine script named 'iondvSignals' from the script bellow add it to the chart:
+```
+//©akumidv
+//@version=4
+study("iondv Signals", shorttitle="iondvSignals", overlay=true)
+strTSBuy = input("", "TSBuy")
+strTSBuy = input("", "TSSell")
+tickerName = input("", "Ticker")
+var arrTSBuy = str.split(buy_series_time, ",")
+var arrTSSell = str.split(sell_series_time, ",")
+plotchar(tickerName == syminfo.ticker and array.includes(arrTSBuy, tostring(time)) ? low : na, location = location.belowbar, color=color.green, char='▲')
+plotchar(tickerName == syminfo.ticker and array.includes(arrTSSell, tostring(time)) ? low : na, location = location.abovebar, color=color.red, char='▼')
+```
+
+After that, upload the signals from the file created accordingly the template
 ```CSV
 timestamp,ticker,timeframe,signal
 1625718600000,BTCUSDT,1m,BUY
 2021-07-27T01:00:00Z,BABA,1H,SELL
 ```
 
+The signals are stored in the browser, to activate them, open the properties of the created indicator named 'iondvSignals'.
+
+#### PS
+** The field separator for CSV files is a comma.
+
 ## Browser configuration
 If Chrome tab that have your backtest running is not active or minimized the backtest will stop working till the tab is active again.
-To avoid this:
-* Main Menu > More tools > Performance > Always keep these sites active > Add Button (Add TV domain)
+To avoid this :
+* Main Menu > More tools > Perfomance > Always keep these sites active > Add Button (Add TV domain)
 * Close all other tabs (except TV) > goto [chrome://discards/](chrome://discards/) > Find TV Tab(s) > Toggle Auto Discardable from ✔ to ❌
 
 
@@ -155,25 +178,29 @@ Please add issues in this repository by following [link](https://github.com/akum
 Very helpful will be if you can attach full screenshot with tradingview page and errors. And also with open command tab in browser developer mode (please press F12 to open developer mode and click on console tab)
 
 
-## Translating the code into Python
+## Translating the code into Python.
 
-If your strategy requires a large amount of testing, it is recommended to convert it to Python and perform backtesting/hyperoptimization using Google Colab or your own server (5-10x faster per cycle, deeper history). See examples at [trade-strategies-backtesting-optimization](https://github.com/akumidv/trade-strategies-backtesting-optimization) — you can run them directly on Google Colab for free (upload `*.ipynb` files to Google Drive and open).
+If your strategy requires a large amount of testing, it is recommended to order its conversion into python and perform 
+backtesting and hyperoptimization of parameters using resources, such as Google Collab or your computer. In addition, it significantly speeds up the search for parameters (in 5-10 times per cycle) and history deep. Examples in Jupyter Notebooks in repository [trade-strategies-backtesting-optimization](https://github.com/akumidv/trade-strategies-backtesting-optimization). You can run examples in Google Collab, it's free. You would just upload files  with extension `*.ipynb` to your Google Drive and open these files.
 
-When converting from TradingView scripts, common issues include:
-* **Different indicator formulas**: some indicators (supertrend, `ta.RMA`, etc.) produce different results than `ta-lib` in Python and need to be reimplemented.
-* **Data**: crypto data is mostly free, but low timeframes are usually paid (e.g. eodhistoricaldata). Requires implementing an interface and local/cloud storage.
-* **Data discrepancies**: stock/forex/crypto data on TV may differ from actual exchange data.
-* **Framework integration**: backtesting, backtrader, vectorbt, etc.
-* **Hyperoptimization**: wrapping code into a parameter optimization framework.
+Where transfering from TradingViews scripts usually developer should solve some promblems:
+* Trading view indicators – some of them have different formulas to calculate results, for example supertrend, ta.RMA and more others. They need additional implementation and in results they calculated more slowly than if python script would use `ta-lib`.
+* Implementation of the data parsing. If the data for the crypt is mostly free, but the data of low timeframes is usually paid (for example, eodhistoricaldata). Developer need to implement an interface to them and some process to store and reuse local(cloud) stored data.
+- Difference in data for stock or forex exchanges from Tradingview. Also, for some cryptocurrency exchanges.
+- Adopt framework of backtesting (backtesting, backtrader, vectorbot, etc.) to work with strategy
+- Wrap this code for frameworks of parameter gyperspace optimization (simple example you can see in [trade-strategies-backtesting-optimization](https://github.com/akumidv/trade-strategies-backtesting-optimization)) and increase speed of backtesting with some methods.
 
-From experience: ~2-3 minutes of developer time per line of script. A 200-line strategy ≈ 6 hours to convert.
 
-Useful repositories:
-* [tradingview-ta-lib](https://github.com/akumidv/tradingview-ta-lib) — TV `ta` lib implementation in Python
-* [catcher-bot](https://github.com/akumidv/catcher-bot) — bot for screening signals across exchanges
+From my experience it demands 2-3 minutes developer time for each row of tradingview script. For example if you have 200 line strategy it would demand ~6 hours to conversion. For some complicated strategies it can demand much more.
+
+To reduce developing time you can use some my repositories: 
+* [tradingview-ta-lib](https://github.com/akumidv/tradingview-ta-lib) - Tradingview `ta` lib implementation in python (only for tradingview indecators that have different caclulatoin results with `ta-lib` or `python-ta` - early developing stage.
+* [catcher-bot](https://github.com/akumidv/catcher-bot) - Bot for screening all symbols on excahnges/exchanges and cath trade signals - early developing stage.
 
 ## Contacts
 
 akumidv `[at]` yahoo.com  (Do not send errors to email please, use [github issues](https://github.com/akumidv/tradingview-assistant-chrome-extension/issues) for them)
 
 https://linkedin.com/in/akuminov
+
+Email is preferred way, but usually I do not have the ability to answer quickly (2-3 days delay).

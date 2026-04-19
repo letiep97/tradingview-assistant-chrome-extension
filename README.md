@@ -58,11 +58,18 @@ Nếu chiến lược tạo ra lợi nhuận vượt trội so với buy-and-hol
 ![](docs/Screenshot3.png) (Results: Show 3D Chart)
 
 #### Phương pháp tối ưu hóa
-- **Cải thiện tuần tự**: điều chỉnh giá trị tốt nhất đã tìm, không duyệt toàn bộ không gian.
-- **Brute force**: kiểm thử tất cả các tổ hợp tham số.
-- **Annealing**: tìm kiếm kết quả tốt nhất với [ít bước hơn](https://en.wikipedia.org/wiki/Simulated_annealing), thu hẹp phạm vi dần xung quanh giá trị tìm được.
-- **Cải thiện ngẫu nhiên**: chọn ngẫu nhiên một tham số, gán giá trị ngẫu nhiên, ghi nhớ nếu tốt hơn.
-- **Ngẫu nhiên**: luôn chọn ngẫu nhiên tất cả tham số cùng lúc (mặc định).
+Phương pháp **cải thiện tuần tự** thực hiện điều chỉnh giá trị tốt nhất đã tìm, không duyệt toàn bộ không gian tham số.
+Logic hoạt động: lấy trạng thái tốt nhất hiện tại (tham số cho kết quả tối đa). Duyệt lần lượt từng tham số và kiểm tra toàn bộ giá trị trong phạm vi. Nếu tìm được kết quả tốt hơn, tiếp tục từ trạng thái đó. Sau đó chuyển sang tham số tiếp theo, v.v.
+
+Phương pháp **brute force** kiểm thử tất cả các tổ hợp trong không gian tham số.
+
+Phương pháp **annealing** tìm kiếm kết quả tốt nhất với [ít bước hơn](https://en.wikipedia.org/wiki/Simulated_annealing).
+Cách hoạt động: xác định trạng thái tốt nhất và tham số tương ứng. Chọn ngẫu nhiên một tham số, sau đó chọn ngẫu nhiên giá trị trong phạm vi, kiểm tra kết quả — nếu tốt hơn thì ghi nhớ và tiếp tục thay đổi từ trạng thái đó.
+Khi số lần kiểm thử tăng, phạm vi giá trị thu hẹp dần xung quanh giá trị đã tìm được. Ở giai đoạn đầu, phương pháp tìm kiếm toàn bộ không gian; về cuối, tập trung cải thiện trạng thái tốt nhất. Để tránh bị kẹt ở một vùng tham số (như phương pháp tuần tự), tất cả tham số đều thay đổi đồng thời theo chu kỳ.
+
+Phương pháp **cải thiện ngẫu nhiên** là đơn giản nhất. Chọn ngẫu nhiên một tham số, gán giá trị ngẫu nhiên trong phạm vi, ghi nhớ nếu kết quả tốt hơn. Sau đó tiếp tục thay đổi tham số từ trạng thái đó.
+
+Phương pháp **ngẫu nhiên** — luôn chọn ngẫu nhiên tất cả tham số cùng lúc (mặc định).
 
 ### Tải tín hiệu bên ngoài lên biểu đồ Tradingview
 
@@ -70,7 +77,21 @@ Tải tín hiệu mua/bán theo timestamp từ file CSV.
 
 ![](docs/Screenshot2.png)
 
-Tạo pine script `iondvSignals` từ file trong popup và thêm vào biểu đồ. Sau đó tải tín hiệu từ file CSV theo mẫu:
+Để hiển thị tín hiệu, cần tạo pine script tên `iondvSignals` từ đoạn script dưới đây và thêm vào biểu đồ:
+```
+//©akumidv
+//@version=4
+study("iondv Signals", shorttitle="iondvSignals", overlay=true)
+strTSBuy = input("", "TSBuy")
+strTSBuy = input("", "TSSell")
+tickerName = input("", "Ticker")
+var arrTSBuy = str.split(buy_series_time, ",")
+var arrTSSell = str.split(sell_series_time, ",")
+plotchar(tickerName == syminfo.ticker and array.includes(arrTSBuy, tostring(time)) ? low : na, location = location.belowbar, color=color.green, char='▲')
+plotchar(tickerName == syminfo.ticker and array.includes(arrTSSell, tostring(time)) ? low : na, location = location.abovebar, color=color.red, char='▼')
+```
+
+Sau đó tải tín hiệu từ file theo mẫu:
 ```csv
 timestamp,ticker,timeframe,signal
 1625718600000,BTCUSDT,1m,BUY
@@ -114,14 +135,16 @@ Khi chuyển đổi từ TradingView script, thường gặp các vấn đề:
 * **Tích hợp framework**: backtesting, backtrader, vectorbt, v.v.
 * **Hyperoptimization**: wrap code vào framework tối ưu tham số.
 
-Kinh nghiệm thực tế: ~2-3 phút developer/dòng script. Chiến lược 200 dòng ≈ 6 giờ chuyển đổi.
+Kinh nghiệm thực tế: ~2-3 phút developer/dòng script. Chiến lược 200 dòng ≈ 6 giờ chuyển đổi. Với các chiến lược phức tạp, thời gian có thể nhiều hơn đáng kể.
 
 Một số repo hỗ trợ:
-* [tradingview-ta-lib](https://github.com/akumidv/tradingview-ta-lib) — implement `ta` lib của TV trong Python
-* [catcher-bot](https://github.com/akumidv/catcher-bot) — bot screening tín hiệu trên nhiều sàn
+* [tradingview-ta-lib](https://github.com/akumidv/tradingview-ta-lib) — implement `ta` lib của TV trong Python (chỉ cho các indicator có kết quả tính toán khác `ta-lib` hoặc `python-ta` — đang phát triển)
+* [catcher-bot](https://github.com/akumidv/catcher-bot) — bot screening tín hiệu trên nhiều sàn (đang phát triển)
 
 ## Liên hệ
 
 akumidv `[at]` yahoo.com (Không gửi lỗi qua email — dùng [github issues](https://github.com/akumidv/tradingview-assistant-chrome-extension/issues))
 
 https://linkedin.com/in/akuminov
+
+Email là cách liên hệ ưu tiên, nhưng thường phản hồi chậm (trễ 2-3 ngày).
