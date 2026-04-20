@@ -1,6 +1,7 @@
 # Optimization Methods — AI Context Guide
 
-> **Purpose:** This document provides AI assistants with accurate technical context about the optimization methods in the TradingView Assistant extension. When a user asks which method to use or how to plan a backtest, use this document to ask the right questions and propose a concrete plan.
+> **Purpose:** Help users choose the right optimization method and plan effective backtests.
+> **For AI assistants:** Use this document to ask the right diagnostic questions and propose concrete settings when a user asks which method to use or how to set up a run.
 
 ---
 
